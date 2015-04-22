@@ -1,6 +1,7 @@
 #include"stdio.h"
 #include "stdlib.h"
 #include "string.h"
+//我想知道git中能不能显示中文字符
 //Copyright by Robothy @ 2015
 namespace data_structure
 {
