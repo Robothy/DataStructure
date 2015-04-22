@@ -1,7 +1,7 @@
 #include"stdio.h"
 #include "stdlib.h"
 #include "string.h"
-
+//Copyright by Robothy @ 2015
 namespace data_structure
 {
 class List
@@ -143,4 +143,14 @@ class List
 				return true;
 			}
 	};
+
+class Stack
+{
+public:
+	typedef struct Data
+		{
+			int num;
+			char name[30];
+		}Data,*pData;
+};
 }
