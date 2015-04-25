@@ -1,145 +1,198 @@
-#define my
-//#define net
-
-#ifdef net
- #include <stdio.h>
- #include <stdlib.h>
-
-#define ElemType char
-
-//节点声明，数据域、左孩子指针、右孩子指针
-
-typedef struct BiTNode{
-
-    char data;
-
-    struct BiTNode *lchild,*rchild;
-
-}BiTNode,*BiTree;
-
-//先序建立二叉树
-
-BiTree CreateBiTree(){
-
-    char ch;
-
-    BiTree T;
-
-    scanf("%c",&ch);
-
-    if(ch=='#')T=NULL;
-
-    else{
-
-        T = (BiTree)malloc(sizeof(BiTNode));
-
-        T->data = ch;
-
-        T->lchild = CreateBiTree();
-
-        T->rchild = CreateBiTree();
-
-    }
-
-    return T;//返回根节点
-
-}
-
-//先序遍历二叉树
-
-void PreOrderTraverse(BiTree T){
-
-    if(T){
-
-       printf("%c",T->data);
-
-       PreOrderTraverse(T->lchild);
-
-       PreOrderTraverse(T->rchild);
-
-    }
-
-}
-
-
-
-//中序遍历
-
-void InOrderTraverse(BiTree T){
-
-    if(T){
-
-       PreOrderTraverse(T->lchild);
-
-       printf("%c",T->data);
-
-       PreOrderTraverse(T->rchild);
-
-    }
-
-}
-
-//后序遍历
-
-void PostOrderTraverse(BiTree T){
-
-    if(T){
-
-       PreOrderTraverse(T->lchild);
-
-       PreOrderTraverse(T->rchild);
-
-       printf("%c",T->data);
-
-    }
-
-}
-
-int main(){
-
-    BiTree T;
-
-    T = CreateBiTree();//建立
-
-    PreOrderTraverse(T);//输出
-
-    getch();
-    return 0;
-}
-#endif // net
-
-
-#ifdef my
-
-#define string_
 #include "stdio.h"
 #include "stdlib.h"
+#include "iostream"
+
+using namespace std;
 
 typedef struct BiTree
 {
-	char data;
+	char data,tag;
 	struct BiTree *Lchild;
 	struct BiTree *Rchild;
-}*pBiTree,BiTree;
+	struct BiTree *next;
+}*pBiTree,BiTree,LinkStack,*pLinkStack;
 
-#ifdef char_group
-void CreateBiTree(pBiTree &T,char ch[],int &i)
+///Initialize the stack
+void StackInit(pLinkStack &LS)
 {
-	T=NULL;
-	i++;
-	if(ch[i]!=' ')
-	{
-		T=(pBiTree)malloc(sizeof(BiTree));
-		T->data = ch[i];
-		CreateBiTree(T->Lchild,ch,i);
-		CreateBiTree(T->Rchild,ch,i);
-	}
-
-	return;
+	LS = NULL;
 }
-#endif // char_group
 
-#ifdef string_
+///Print data
+void ShowNode(pLinkStack &e)
+{
+    cout << e->data
+    << endl;
+}
+
+///Pop from the stack
+bool StackPop(pLinkStack &LS,pLinkStack &e)
+{
+    if(!LS) return false;
+    e = LS;
+    LS = LS->next;
+    e->next = NULL;
+    return true;
+}
+
+///Get the top of a stack without any influence on stack.
+bool StackGetTop(pLinkStack &LS,pLinkStack &e)
+{
+	if(!LS) return false;
+	e = LS;
+	return true;
+}
+
+///Inorder traversal BiTree by recursion
+void RecursionOrderTree(pBiTree &T)
+{
+	if(!T) return;
+	cout << T->data;
+	RecursionOrderTree(T->Lchild);
+	RecursionOrderTree(T->Rchild);
+}
+
+///Push on
+bool StackPush(pLinkStack &LS,pLinkStack &e)
+{
+    if(!e)  return false;
+    e->next = LS;
+    LS = e;
+    return true;
+}
+
+///Show node's member's message
+void ShowDetails(pBiTree &p)
+{
+	cout << "\n------------------\n";
+	if(!p)
+	{
+		cout << "tag = ?" << endl;
+		cout << "data = ?" << endl;
+		if(!p)	cout << "p is NULL!" << endl;
+	}
+	else
+	{
+		cout << "tag = " << p->tag <<endl;
+		cout << "data = " << p->data << endl;
+		if(p)	cout << "p is not NULL!" << endl;
+	}
+	cout << "\n------------------\n";
+	system("pause");
+}
+
+///Preorder traverasl BiTree by stack
+void StackOrderTree(pBiTree &T)
+{
+	pBiTree p = T;
+	pLinkStack LS;
+	while(p||LS)
+	{
+		while(p)
+		{
+			cout << p->data;
+			StackPush(LS,p);
+			p = p->Lchild;
+		}
+		if(LS)
+		{
+			StackPop(LS,p);
+			p = p->Rchild;
+		}
+	}
+}
+
+///Exchange BiTree's left child and right child
+void ExchangeChild(pBiTree &T)
+{
+	pBiTree p = T,temp = NULL;
+	pLinkStack LS,_LS;
+	StackInit(LS);
+	StackInit(_LS);
+	int i=0;
+	while(p||LS)
+	{
+		while(p)
+		{
+			StackPush(LS,p);
+			p = p->Lchild;
+
+		}
+		if(LS)
+		{
+			StackPop(LS,p);
+			StackPush(_LS,p);
+			p = p->Rchild;
+		}
+	}
+	while(_LS)
+	{
+		StackPop(_LS,p);
+		temp = p->Lchild;
+		p->Lchild = p->Rchild;
+		p->Rchild = temp;
+	}
+}
+
+
+/*************************************************************
+///Another way to visit a stack.
+void StackOrderTree(pBiTree &T)
+{
+	pLinkStack LS,e;
+	pBiTree p,fp;
+	p = T;
+	do
+	{
+		if((!p&&LS->tag=='L')||(p&&p->tag=='L'))
+		{
+			LS->tag = 'R';
+			p = LS->Rchild;
+		}
+
+		if(p&&p->tag!='L'&&p->tag!='R')///左子树，右子树都没被访问过
+		{
+			//cout << "visit Lchild!" << endl;
+			//system("pause");
+
+			cout << p->data;
+			e=p;
+			p->tag='L';
+			p=p->Lchild;
+			e->next=NULL;
+			StackPush(LS,e);
+		}
+
+		if(LS->tag=='R')
+		{
+			//cout << "Pop" << endl;
+			StackPop(LS,p);
+			StackGetTop(LS,p);
+			//ShowDetails(p);
+		}
+
+		/*if(!p||(p&&p->tag=='L'))///左子树被访问过，右子树没被访问过
+		{
+			cout << "visit Rchild!" << endl;
+			//system("pause");
+			if(!p)
+			p = e;///p返回到上一个根
+			p->tag = 'R';
+			p = p->Rchild;///开始访问右子树
+		}
+		ShowDetails(p);
+		if(!p||(p&&p->tag=='R'))
+		{
+			cout << "StackPop" << endl;
+			//system("pause");
+			StackPop(LS,p);
+			ShowDetails(p);
+		}
+	}while(LS);
+}
+
+*************************************************************/
+
 void CreateBiTree(pBiTree &T,char *&ch)
 {
 	T = NULL;
@@ -157,42 +210,17 @@ void CreateBiTree(pBiTree &T,char *&ch)
 		return;
 	}
 }
-#endif // string_
 
-void OrderTree(pBiTree &T)
-{
-	if(T)
-	{
-		printf("%c",T->data);
-		OrderTree(T->Lchild);
-		OrderTree(T->Rchild);
-	}
-	else
-	{
-		return;
-	}
-}
 
 int main(void)
 {
-	#ifdef char_group
-	char ch[] = {'-','+','a',' ',' ','*','b',' ',' ','-','c',' ',' ','d',' ',' ','/','e',' ',' ','f',' ',' '};
-	#endif // char_group
 	char *ch="-+a  *b  -c  d  /e  f  ";
-	#ifdef string_
-	#endif // string_
-
 	pBiTree T;
-	int i=-1;
-
-	#ifdef char_group
-	CreateBiTree(T,chs,i);
-	#endif // char_group
-	#ifdef string_
 	CreateBiTree(T,ch);
-	#endif // string_
-	OrderTree(T);
+	RecursionOrderTree(T);cout << endl;
+	StackOrderTree(T);
+	cout << endl;
+	ExchangeChild(T);
+	cout << endl;
 	return 0;
 }
-
-#endif
