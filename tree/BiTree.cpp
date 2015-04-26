@@ -1,3 +1,6 @@
+/*
+*	This program is free , if possible , any one can use it to do something useful!
+*/
 #include "stdio.h"
 #include "stdlib.h"
 #include "iostream"
